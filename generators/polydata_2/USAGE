@@ -1,0 +1,12 @@
+Description:
+    generate a migration
+
+Example:
+		./script/generate polydata 
+		./script/generate polydata_1
+		./script/generate polydata_2
+
+    This will create:
+        db/migrate/xxx_add_polydata_cache.rb
+        db/migrate/xxx_add_polydata_cached_canonical_ids.rb
+				db/migrate/xxx_add_polydata_cache_counter.rb
