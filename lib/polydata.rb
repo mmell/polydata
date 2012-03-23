@@ -1,5 +1,4 @@
-require "polydata/engine"
-require "polydata/config.rb"
+require "polydata/client.rb"
 require "polydata/instance.rb"
 require "polydata/key.rb"
 require "polydata/render.rb"
@@ -14,17 +13,6 @@ module Polydata
 
   TimestampRangeSecs = 90 # seconds +/-
 
-  def self.xrd( endpoint )
-    #<ProviderID>xri://!!1003!#{LOCAL_RETAILER_ID}</ProviderID>
-    sep = %Q{
-<Service>
-<Type select='true'>#{Polydata::Config::SEP_TYPE}</Type>
-<Path select='true'>(#{Polydata::Config::SEP_PATH})</Path>
-<URI priority='10' append='qxri'>#{endpoint}</URI>
-</Service>
-}
-  end
-
   def self.response_valid?(response)
     response.index('$error') != 0
   end
@@ -36,11 +24,6 @@ module Polydata
   end
 
   def self.get_public_key( opts = {} )
-    # if you're using PolydataCache use this instead:
-#    PolydataCache.cache_get_polydata(
-#      :polydata_request => self.get_public_key_request(:polydata_request => @polydata_request),
-#      :end_point => PolyDataClient[:endpoint]
-#    )
     Polydata::polyxri_get(:polydata_request => self.get_public_key_request( opts ), :end_point => opts[:end_point])
   end
 
@@ -78,31 +61,4 @@ module Polydata
     Polydata.check_timestamp(decrypted_secs.to_i)
   end
 
-  def self.polyxri_get(opts = {})
-    AtLinksafe::UriLib::fetch_uri(end_point_uri(opts)).body
-  end
-
-  # If this is a POST request then the polydata_request is a POST argument, not in the url
-  def self.polyxri_post( opts = {} )
-    raise RuntimeError, "Polydata request must include a Requester." if opts[:private_key] and !opts[:polydata_request].requester
-    opts[:headers] ||= {}
-    opts[:use_ssl] ||= true
-    opts[:post] = true
-    args = "auth_timestamp=#{CGI::escape( Polydata.get_auth_token(opts[:private_key]) ) }" if opts[:private_key]
-    args << "&post_data=#{CGI::escape(opts[:post_data].to_s)}" if opts[:post_data]
-    args << "&polydata_request=#{CGI::escape(opts[:polydata_request].to_s)}"
-    AtLinksafe::UriLib.post(
-      end_point_uri(opts), args, opts[:headers], opts[:use_ssl], {}
-    ).body
-  end
-
-  def self.end_point_uri(opts = {})
-    opts[:end_point] ||= AtLinksafe::Resolver::ResolveSEPToXRD.new(opts[:polydata_request].authority_cid, Polydata::Config::SEP_PATH).uri
-    if !opts[:post]
-      opts[:end_point] + CGI::escape(opts[:polydata_request].to_s)
-    else
-      opts[:end_point]
-    end
-  end
-
-end # /module Polydata
+end
