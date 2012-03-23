@@ -1,18 +1,8 @@
-# 
-# > cd vendor/plugins/polydata/lib 
-# > ruby ../test/request_test.rb 
+require "polydata"
 
-require 'test/unit' 
-require 'cgi'
-require 'rubygems'
-require 'mocha'
-require 'activerecord'
-#require '../../at_linksafe/lib/at_linksafe.rb'
-require "polydata.rb"
-
-class RequestTest < ActiveSupport::TestCase
+class RequestTest < Test::Unit::TestCase
   def OFFtest_truth
-    hsh = { 
+    hsh = {
       :action => '$get',
       :authority => '@llli*sys*reg',
       :requester => '@llli*sys*data',
@@ -25,28 +15,28 @@ class RequestTest < ActiveSupport::TestCase
     assert(polydata_request.type.child.relation == '=')
     assert(polydata_request.type.child.flat_query_path == '+supporter/kintera_id')
 
-    uri = Polydata.end_point_uri( 
-      :polydata_request => polydata_request, 
+    uri = Polydata.end_point_uri(
+      :polydata_request => polydata_request,
       :end_point => 'https://reg.llli.org/xri/'
       )
     assert_equal(uri, 'https://reg.llli.org/xri/%40llli%2Asys%2Areg%2F%28%2Bsupporter%2Fkintera_id%24value%3D185253295%29%2F%28%24get%29%2F%28%40llli%2Asys%2Adata%29')
   end
-  
+
   def test_decode
-    hsh = { 
+    hsh = {
       :authority => '@llli*sys',
 #      :action => '$get',
       :type => "+supporter$value=@!1234.asdf",
     }
-    polydata_request = Polydata::Request.new(hsh)    
+    polydata_request = Polydata::Request.new(hsh)
     polydata_request = Polydata::Request.decode(polydata_request.encode)
     assert(polydata_request.type.has_data?)
     assert_equal( '+supporter', polydata_request.type.flat_query_path)
-    
+
     polydata_request = Polydata::Request.decode('@llli*sys/(+supporter$value=@!asdf.1234)')
     assert(polydata_request.type.has_data?)
     assert_equal( '+supporter', polydata_request.type.flat_query_path)
-    
+
     polydata_request = Polydata::Request.decode('@llli*sys/(+supporter$value=@!asdf.1234/role$value=ActiveMember)')
     assert(polydata_request.type.has_data?)
     assert_equal( '+supporter/role', polydata_request.type.flat_query_path)
@@ -72,11 +62,11 @@ class RequestTest < ActiveSupport::TestCase
     assert(polydata_request.type.last.is_canonical?)
     assert_equal('1661373', polydata_request.type.last.query_path)
     assert_equal('1661373', polydata_request.type.last.instance_id)
-    
+
   end
-  
+
   def OFFtest_request
-    hsh = { 
+    hsh = {
       :action => '$get',
       :authority => '@llli*sys',
       :type => "+supporter/kintera_id$value=185253295",
@@ -88,7 +78,7 @@ class RequestTest < ActiveSupport::TestCase
     assert_equal('=', polydata_request.type.child.relation)
     assert_equal('$value', polydata_request.type.child.data_type)
     assert_equal('185253295', polydata_request.type.child.value)
-    
+
     polydata_request.type = {:query_path => '+supporter', :data_type => '$value', :relation => '=', :value => '@!72CD'}
     assert(polydata_request.type.has_data?)
     assert_equal('+supporter', polydata_request.type.flat_query_path)
@@ -96,7 +86,7 @@ class RequestTest < ActiveSupport::TestCase
     assert_equal('=', polydata_request.type.relation)
     assert_equal('@!72CD', polydata_request.type.value)
     assert_nil( polydata_request.type.instance_id)
-    
+
     polydata_request.type = {:query_path => '+supporter', :data_type => '$id', :relation => '=', :value => '1234'}
     assert_equal('+supporter', polydata_request.type.flat_query_path)
     assert_equal('$id', polydata_request.type.data_type)
@@ -104,7 +94,7 @@ class RequestTest < ActiveSupport::TestCase
     assert_equal('1234', polydata_request.type.value)
     assert_equal('1234', polydata_request.type.instance_id)
 
-    hsh = { 
+    hsh = {
       :action => '$get',
       :authority => '@llli*sys',
       :requester => '',
@@ -119,7 +109,7 @@ class RequestTest < ActiveSupport::TestCase
     authority_cid = '@!1234!5678'
     Polydata.stubs(:resolve_cid).with('@llli*sys').once.returns(authority_cid)
 
-    hsh = { 
+    hsh = {
       :action => '$get',
       :authority => '@llli*sys',
       :requester => '@llli*sys*data',

@@ -3,7 +3,7 @@ require "polydata.rb"
 require 'net/https'
 require 'uri'
 
-class KeyTest < ActiveSupport::TestCase
+class KeyTest < Test::Unit::TestCase
   def test_one
     # test generate_pair, signing and verifying
     tmp_path = "/tmp/#{OpenSSL::Digest::MD5.hexdigest( rand(Time.new.to_i).to_s ).upcase}" # FIXME make this configurable/portable

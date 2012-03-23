@@ -1,11 +1,11 @@
 require 'base64'
 
 module Polydata
-  
+
   class Request
     attr_accessor :authority, :sep_path, :action_minor, :requester, :data
     attr_reader :type, :action
-    
+
     def initialize(hsh)
       @authority = hsh[:authority]
       self.type = hsh[:type]
@@ -15,33 +15,33 @@ module Polydata
       raise( RuntimeError, "An authority is required.") unless @authority
       @action = Request.default_action unless @action
     end
-    
+
     def authority_cid
       @authority_cid ||= Polydata.resolve_cid(@authority)
     end
-    
+
     def requester_cid
       return nil unless @requester
       @requester_cid ||= Polydata.resolve_cid(@requester)
     end
-    
+
     def type=(something) # accepts TypeData, string or hash
       @type = something.is_a?(TypeData) ? something : TypeData.new(something)
     end
-    
+
     def action=(s)
       @action, b = Request.parse_whole_action( s )
       @action_minor ||= b
     end
-    
+
     def encode_action
       "#{@action}#{@action and @action_minor ? '/' + @action_minor : ''}"
     end
-    
+
     def to_s
       encode
     end
-    
+
     def encode
       s = "#{@authority}/(#{@type})" #(#{Polydata::Config::SEP_PATH})/
       s << "/(#{encode_action})" unless (@action.nil? or encode_action == Request.default_action) and @requester.nil? and @data.nil?
@@ -51,16 +51,12 @@ module Polydata
       end
       s
     end
-    
-    def self.decode(xri) # FIXME handle endpoint e.g. http://data.llli.org:8080/@llli/+address
+
+    def self.decode(xri)
       hsh = {}
       hsh[:authority], xrisplit = xri.split('/', 2)
       xrisplit.gsub!( /^\(\+polydata\)\//, '') # Regexp.escape # Polydata::Config::SEP_PATH  is optional
-# Ruby 1.9.1
 #      raise StandardError, "query path not recognized" unless xrisplit[0] == '(' and xrisplit[-1] == ')'
-# Ruby 1.8.x
-      # 40 == '(' and 41 == ')'
-#      raise StandardError, "query path not recognized" unless xrisplit[0].to_i == 40 and xrisplit[-1].to_i == 41
 
       open_ixs, close_ixs, segments = [0], [], []
       # this is 2-3x faster than (0...xrisplit.length).each { |e|
@@ -109,7 +105,7 @@ module Polydata
       end
       self.new(hsh)
     end
-    
+
     def self.parse_whole_action(s)
       if s.nil? or s == ''
         [nil, nil]
@@ -117,7 +113,7 @@ module Polydata
         s.split('/', 2)
       end
     end
-    
+
     def self.default_action
       '$get'
     end

@@ -1,8 +1,8 @@
-require 'test/unit' 
+require 'test/unit'
 require "polydata/instance"
 
 
-class InstanceTest < ActiveSupport::TestCase
+class InstanceTest < Test::Unit::TestCase
   def test_truth
     instance = Polydata::Instance.new(4, 'mike', '+supporter')
     assert_equal(4, instance.id)
@@ -10,4 +10,4 @@ class InstanceTest < ActiveSupport::TestCase
     assert_equal('+supporter', instance.query_path)
     assert_equal(instance.value, instance.render )
   end
-end # /class InstanceTest
+end

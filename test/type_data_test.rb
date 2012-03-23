@@ -1,12 +1,12 @@
-# 
-# > vendor/plugins/polydata/lib mmell$ ruby ../test/type_data_test.rb 
+#
+# > vendor/plugins/polydata/lib mmell$ ruby ../test/type_data_test.rb
 
-require 'test/unit' 
+require 'test/unit'
 require "polydata/type_data.rb"
 require "polydata/type_segment.rb"
 
-class TypeDataTest < ActiveSupport::TestCase
-  
+class TypeDataTest < Test::Unit::TestCase
+
   def test_one_level
     assert_raise(RuntimeError) { Polydata::TypeData.new }
     assert_raise(RuntimeError) { Polydata::TypeData.new('') }
@@ -25,7 +25,7 @@ class TypeDataTest < ActiveSupport::TestCase
     assert_equal( 2, td[0].instance_id)
     td[0].instance_id = [2,3]
     assert_equal( [2,3], td[0].instance_id)
-    
+
 
     td = Polydata::TypeData.new('+supporter/')
     assert_equal('+supporter', td.encode)
@@ -85,8 +85,8 @@ class TypeDataTest < ActiveSupport::TestCase
     assert_equal('=', td.first.relation)
     assert_equal('@!72CD.1', td.first.value)
     assert(td.child_of, td.inspect)
-    assert_not_nil( td.child_of(td[0]) ) 
-    assert_nil( td.child_of(td[1]) ) 
+    assert_not_nil( td.child_of(td[0]) )
+    assert_nil( td.child_of(td[1]) )
     assert_equal('+supporter/role', td.flat_query_path( td[1] ) )
     assert_equal('+supporter/role', td.flat_query_path( td.child_of(td[0]) ) )
     assert_equal('+supporter/role', td.flat_query_path( td.last ) )
@@ -96,7 +96,7 @@ class TypeDataTest < ActiveSupport::TestCase
     td.delete_at(td.last.position)
     assert_nil(td.child_of)
     assert_equal('+supporter', td.flat_query_path(td.last))
-    
+
     td = Polydata::TypeData.new('+admin/lllids$value=@llli*area*alaska/_/admins')
     assert_equal('+admin/lllids$value=@llli*area*alaska/_/admins', td.encode)
     assert_equal('+admin', td.encode(0))
@@ -188,7 +188,7 @@ class TypeDataTest < ActiveSupport::TestCase
         :query_path => 'role',
         :data_type => '$value',
         :relation => '$in',
-        :value => '[ActiveMember,ActiveLeader]', 
+        :value => '[ActiveMember,ActiveLeader]',
       }
     ]
     )
@@ -200,7 +200,7 @@ class TypeDataTest < ActiveSupport::TestCase
     assert_equal('[ActiveMember,ActiveLeader]', td.child_of.value)
 
     td = Polydata::TypeData.new(
-    [ 
+    [
       {
         :query_path => '+supporter',
         :data_type => '$value',
@@ -220,7 +220,7 @@ class TypeDataTest < ActiveSupport::TestCase
   def test_parent_flat_query_path
     td = Polydata::TypeData.new(
     "+supporter/lllid$value=@llli*mike/#{Polydata::TypeSegment::ParentQueryPath}/lllid"
-    )    
+    )
     assert_equal('+supporter/lllid', td.flat_query_path)
     assert_equal('+supporter/lllid', td.flat_query_path(1))
     assert_equal('+supporter', td.flat_query_path(2))
@@ -229,7 +229,7 @@ class TypeDataTest < ActiveSupport::TestCase
 
     td = Polydata::TypeData.new(
     "+supporter/role$value=Leder/#{Polydata::TypeSegment::ParentQueryPath}/lllid"
-    )    
+    )
     assert_equal('+supporter/lllid', td.flat_query_path)
     assert_equal('+supporter', td.flat_query_path(0))
     assert_equal('+supporter/role', td.flat_query_path(1))
@@ -241,7 +241,7 @@ class TypeDataTest < ActiveSupport::TestCase
     "+supporter$value=@!72CD/role$value$in[ActiveMember,ActiveLeader]/#{Polydata::TypeSegment::ParentQueryPath}"
     )
     assert(td[2].is_parent_query?)
-    assert_equal(td.flat_query_path, td.flat_query_path(2))    
+    assert_equal(td.flat_query_path, td.flat_query_path(2))
 
     td = Polydata::TypeData.new([
       {
@@ -254,7 +254,7 @@ class TypeDataTest < ActiveSupport::TestCase
       ]
       )
     assert(td[2].is_parent_query?)
-    assert_equal(td.flat_query_path, td.flat_query_path(2))    
+    assert_equal(td.flat_query_path, td.flat_query_path(2))
 
     td = Polydata::TypeData.new(
     "+supporter$value=@!72CD/role$value$in[ActiveMember,ActiveLeader]/#{Polydata::TypeSegment::ParentQueryPath}/lllid"
@@ -275,7 +275,7 @@ class TypeDataTest < ActiveSupport::TestCase
     assert_equal('+supporter/foo1/foo2', td.flat_query_path(2) )
     assert_equal('+supporter/foo1', td.flat_query_path(3) )
     assert_equal('+supporter/foo1/foo3', td.flat_query_path(4) )
-        
+
     td = Polydata::TypeData.new(
     "+supporter/foo1/foo2/#{Polydata::TypeSegment::ParentQueryPath}/#{Polydata::TypeSegment::ParentQueryPath}/foo3"
     )
@@ -286,11 +286,11 @@ class TypeDataTest < ActiveSupport::TestCase
     assert_equal('+supporter/foo1', td.flat_query_path(3) )
     assert_equal('+supporter', td.flat_query_path(4) )
     assert_equal('+supporter/foo3', td.flat_query_path(5) )
-        
+
   end
 
   def test_merge_parent
-    td = Polydata::TypeData.new( 
+    td = Polydata::TypeData.new(
       [
         { :query_path => '+supporter' },
         'role$value$in[ActiveMember,ActiveLeader]'
@@ -303,7 +303,7 @@ class TypeDataTest < ActiveSupport::TestCase
     assert_equal('$in', td.child_of.relation)
     assert_equal('[ActiveMember,ActiveLeader]', td.child_of.value)
 
-    
+
     td = Polydata::TypeData.new(
     [
       '+supporter',
@@ -321,7 +321,7 @@ class TypeDataTest < ActiveSupport::TestCase
 
   def test_array
     td = Polydata::TypeData.new( '+supporter$id$in[123456]' )
-    assert(td[0].instance_id)
+    assert_nil(td[0].instance_id)
     assert_equal('$id', td[0].data_type)
     assert_equal('$in', td[0].relation)
     assert_equal('[123456]', td[0].value)
