@@ -1,8 +1,8 @@
 = Polydata
 
 Polydata takes its name from the idea of multiple hierarchies or "poly-archical"
-structure of related bits of data. In a hierarchical database information can be
-nested. In a polyarchy information can reside in multiple hierarchies. This is a
+structure of related bits of data. In a hierarchical data structure, information can be
+nested. In a polyarchy, information can be located in multiple hierarchies, in other words, a
 multidimensional data structure.
 
 This Polydata library defines a domain specific language (DSL) to implement a query-like
@@ -11,13 +11,13 @@ private key to encrypt (not sign) a timestamp. The server and client have public
 and private key pairs residing on the server. The public keys are discoverable
 via XRI resolution.
 
-A polydata request is in the form of Endpoint/Authority/Type[Query]/Action[/ActionMinor]/[Requester].
+A polydata request is in the form of Endpoint/Authority/Type[Query][/Action[/ActionMinor]/[Requester]].
 
 * *Endpoint* is generally a web application available at an https url.
 * *Authority* can be an XRI Canonical Id or Iname.
 * *Type*, *Query* and *Action* implement the DSL.
 * *Type* can be anything the server and client agree on. The only implementation
-extant play fast and loose with XRIs as described here: http://en.wikipedia.org/wiki/XRI
+extant plays fast and loose with XRIs as described here: http://en.wikipedia.org/wiki/XRI
 * *Query* also implements the DSL. See https://github.com/mmell/polydata/blob/master/lib/polydata/type_segment.rb
 * *Action* is $get or $post with an optional minor action.
 * *Requester*, like Authority, can be an XRI Canonical Id or Iname.
