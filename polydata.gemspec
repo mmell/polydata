@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 require "polydata/version"
 
 Gem::Specification.new do |s|
-  s.name        = "Polydata"
+  s.name        = "polydata"
   s.version     = Polydata::VERSION
   s.authors     = ["Mike Mell"]
   s.email       = ["mike.mell@nthwave.net"]
